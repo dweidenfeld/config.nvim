@@ -173,6 +173,7 @@ require('lazy').setup({
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>p', group = '[P]roject' },
         { '<leader>r', group = '[R]un' },
+        { '<leader>m', group = '[M]ode' },
       },
     },
   },
@@ -680,6 +681,8 @@ require('lazy').setup({
     'Kicamon/markdown-table-mode.nvim',
     config = function()
       require('markdown-table-mode').setup()
+
+      vim.keymap.set('n', '<leader>mt', ':Mtm<CR>', { desc = '[M]arkdown [T]able Mode' })
     end,
   },
 
@@ -775,11 +778,25 @@ require('lazy').setup({
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
-  {
+
+  { -- Terminal integration
     'akinsho/toggleterm.nvim',
     version = '*',
     opts = {
       open_mapping = '<C-/>',
+    },
+  },
+
+  {
+    'rmagatti/auto-session',
+    lazy = false,
+
+    ---enables autocomplete for opts
+    ---@module "auto-session"
+    ---@type AutoSession.Config
+    opts = {
+      suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
+      -- log_level = 'debug',
     },
   },
 }, {

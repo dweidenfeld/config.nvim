@@ -1,3 +1,5 @@
+-- [[ Kickstart Neovim Configuration ]]
+
 -- Set <space> as the leader key
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
@@ -662,7 +664,14 @@ require('lazy').setup({
     },
   },
 
-  'github/copilot.vim',
+  {
+    'github/copilot.vim',
+    config = function()
+      --  To configure it, see `:help copilot` and `:help copilot-config`
+      vim.g.copilot_no_tab_map = true
+      vim.keymap.set('i', '<C-J>', 'copilot#Accept("\\<CR>")', { expr = true, replace_keycodes = false })
+    end,
+  },
 
   { -- You can easily change to a different colorscheme.
     'folke/tokyonight.nvim',

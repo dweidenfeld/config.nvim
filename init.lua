@@ -65,7 +65,7 @@ vim.o.confirm = true
 
 -- [[ Basic Keymaps ]]
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-vim.keymap.set('n', '<leader>pv', vim.cmd.Ex)
+vim.keymap.set('n', '<leader>pe', vim.cmd.Ex, { desc = '[P]roject [E]xplorer' })
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
@@ -171,6 +171,8 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>p', group = '[P]roject' },
+        { '<leader>r', group = '[R]un' },
       },
     },
   },
@@ -521,6 +523,16 @@ require('lazy').setup({
     end,
   },
 
+  -- PlantUML syntax highlighting and rendering
+  'aklt/plantuml-syntax',
+  'tyru/open-browser.vim',
+  {
+    'weirongxu/plantuml-previewer.vim',
+    config = function()
+      vim.keymap.set('n', '<leader>rp', ':PlantumlOpen<CR>', { desc = '[R]ender [P]lantUML' })
+    end,
+  },
+
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -662,6 +674,13 @@ require('lazy').setup({
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },
     },
+  },
+
+  {
+    'Kicamon/markdown-table-mode.nvim',
+    config = function()
+      require('markdown-table-mode').setup()
+    end,
   },
 
   {

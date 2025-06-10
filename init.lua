@@ -65,7 +65,29 @@ vim.o.confirm = true
 
 -- [[ Basic Keymaps ]]
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+-- Project navigation keymaps
 vim.keymap.set('n', '<leader>pe', vim.cmd.Ex, { desc = '[P]roject [E]xplorer' })
+
+-- New menu keymaps
+-- Create a new file
+vim.keymap.set('n', '<leader>nf', function()
+  local cwd = vim.fn.expand '%:p:h'
+  local filename = vim.fn.input('New file name: ', cwd .. '/', 'file')
+  if filename ~= '' then
+    vim.cmd('edit ' .. filename)
+  end
+end, { desc = '[N]ew [F]ile' })
+-- Create a new directory
+vim.keymap.set('n', '<leader>nd', function()
+  local cwd = vim.fn.expand '%:p:h'
+  local dirname = vim.fn.input('New directory name: ', cwd .. '/', 'dir')
+  if dirname ~= '' then
+    -- create folder without confirmation
+    vim.fn.mkdir(dirname, 'p')
+    vim.cmd('edit ' .. dirname)
+  end
+end, { desc = '[N]ew [D]irectory' })
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
@@ -174,6 +196,7 @@ require('lazy').setup({
         { '<leader>p', group = '[P]roject' },
         { '<leader>r', group = '[R]un' },
         { '<leader>m', group = '[M]ode' },
+        { '<leader>n', group = '[N]ew' },
       },
     },
   },
@@ -504,6 +527,8 @@ require('lazy').setup({
         'gopls',
         'rust_analyzer',
         'ts_ls',
+        'eslint-lsp',
+        'deno',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 

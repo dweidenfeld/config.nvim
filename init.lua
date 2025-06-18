@@ -92,12 +92,6 @@ end, { desc = '[N]ew [D]irectory' })
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
--- Disable arrow keys in normal mode
-vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
-vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
-vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
-vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
-
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
@@ -254,7 +248,22 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
-        -- pickers = {}
+        pickers = {
+          -- Default configuration for builtin pickers goes here:
+          --  See `:help telescope.builtin` for all the available builtin pickers
+          find_files = {
+            hidden = true, -- Show hidden files
+            no_ignore = true, -- Show files ignored by .gitignore
+            follow = true, -- Follow symlinks
+            file_ignore_patterns = { 'node_modules', '.git', '.venv', '.idea' }, -- Ignore common directories
+          },
+          live_grep = {
+            file_ignore_patterns = { 'node_modules', '.git', '.venv', '.idea' }, -- Ignore common directories
+            additional_args = function()
+              return { '--hidden' } -- Exclude .git directory from live grep
+            end,
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -274,10 +283,18 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+      vim.keymap.set('n', '<leader>sq', builtin.diagnostics, { desc = '[S]earch Diagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      -- search folders in workspace
+      vim.keymap.set('n', '<leader>sd', function()
+        -- This will search only directory names, but not files.
+        builtin.find_files {
+          prompt_title = 'Search Directory',
+          find_command = { 'fd', '--type', 'd', '--hidden', '--exclude', '.git' },
+        }
+      end, { desc = '[S]earch [D]irectory' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -298,9 +315,9 @@ require('lazy').setup({
       end, { desc = '[S]earch [/] in Open Files' })
 
       -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files { cwd = vim.fn.stdpath 'config' }
-      end, { desc = '[S]earch [N]eovim files' })
+      -- vim.keymap.set('n', '<leader>sn', function()
+      --   builtin.find_files { cwd = vim.fn.stdpath 'config' }
+      -- end, { desc = '[S]earch [N]eovim files' })
     end,
   },
 
@@ -733,6 +750,13 @@ require('lazy').setup({
       -- apply the colorscheme
       vim.cmd.colorscheme 'catppuccin'
     end,
+  },
+
+  {
+    'numToStr/Comment.nvim',
+    opts = {
+      -- add any options here
+    },
   },
 
   -- Highlight todo, notes, etc in comments

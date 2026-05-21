@@ -848,6 +848,30 @@ require('lazy').setup({
     },
   },
 
+  { -- IntelliJ-style buffer tabs at the top
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    event = 'VeryLazy',
+    opts = {
+      options = {
+        mode = 'buffers',
+        diagnostics = 'nvim_lsp',
+        -- Reserve a header next to neo-tree so the tabs line up with the editor area
+        offsets = {
+          { filetype = 'neo-tree', text = 'File Explorer', text_align = 'left', separator = true },
+        },
+        show_buffer_close_icons = true,
+        show_close_icon = false,
+      },
+    },
+    keys = {
+      { '<S-h>', '<cmd>BufferLineCyclePrev<cr>', desc = 'Prev buffer' },
+      { '<S-l>', '<cmd>BufferLineCycleNext<cr>', desc = 'Next buffer' },
+      { '<leader>bx', '<cmd>bdelete<cr>', desc = '[B]uffer close' },
+    },
+  },
+
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()

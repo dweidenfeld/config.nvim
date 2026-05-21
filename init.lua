@@ -700,33 +700,29 @@ require('lazy').setup({
         nerd_font_variant = 'mono',
       },
 
-      completion = {
-        -- By default, you may press `<c-space>` to show the documentation.
-        -- Optionally, set `auto_show = true` to show the documentation after a delay.
-        documentation = { auto_show = false, auto_show_delay_ms = 500 },
-      },
-
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev', 'copilot' },
+        default = { 'lsp', 'path', 'snippets', 'lazydev', 'minuet' },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
-          copilot = {
-            name = 'copilot',
-            module = 'blink-cmp-copilot',
-            score_offset = 100,
+          minuet = {
+            name = 'minuet',
+            module = 'minuet.blink',
+            -- Run the local LLM call off the main thread so typing stays smooth
             async = true,
-            -- Tag Copilot items with a distinct kind so they're recognisable in the menu
-            transform_items = function(_, items)
-              local CompletionItemKind = require('blink.cmp.types').CompletionItemKind
-              local kind_idx = #CompletionItemKind + 1
-              CompletionItemKind[kind_idx] = 'Copilot'
-              for _, item in ipairs(items) do
-                item.kind = kind_idx
-              end
-              return items
-            end,
+            -- Give Ollama a generous window — qwen-coder:7b typically responds
+            -- well under a second on Apple Silicon, but cold starts can be slower
+            timeout_ms = 3000,
+            -- Sit just below LSP/lazydev so language-aware suggestions win ties
+            score_offset = 50,
           },
         },
+      },
+      completion = {
+        -- Press <c-space> to show the documentation popup on demand
+        documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        -- Don't kick off completion requests on every keystroke — minuet
+        -- works better when it has a stable prefix to reason about
+        trigger = { prefetch_on_insert = false },
       },
 
       snippets = { preset = 'luasnip' },
@@ -754,21 +750,38 @@ require('lazy').setup({
     end,
   },
 
-  { -- GitHub Copilot (Lua port — suggestions surface through blink.cmp, not ghost text)
-    'zbirenbaum/copilot.lua',
-    cmd = 'Copilot',
+  { -- Local AI completion via Ollama + qwen2.5-coder
+    --
+    -- minuet-ai feeds prefix/suffix context to a local LLM through Ollama's
+    -- OpenAI-compatible completions endpoint. Suggestions arrive as regular
+    -- items in the blink.cmp popup, so Tab/Enter accept them like any other
+    -- completion. No network calls, no API key, no per-call cost.
+    'milanglacier/minuet-ai.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
     event = 'InsertEnter',
-    opts = {
-      -- Ghost text and panel are disabled because blink-cmp-copilot pipes Copilot
-      -- suggestions into the regular completion menu instead.
-      suggestion = { enabled = false },
-      panel = { enabled = false },
-    },
-  },
-
-  { -- Copilot source for blink.cmp
-    'giuxtaposition/blink-cmp-copilot',
-    dependencies = { 'zbirenbaum/copilot.lua' },
+    config = function()
+      require('minuet').setup {
+        provider = 'openai_fim_compatible',
+        -- Ask for a single completion per request — qwen-coder is fast but we
+        -- don't need a fan-out; lower latency, fewer tokens
+        n_completions = 1,
+        context_window = 512,
+        provider_options = {
+          openai_fim_compatible = {
+            -- Ollama doesn't authenticate, but minuet requires an env var name;
+            -- TERM is always set on a real shell, so this is a safe no-op key
+            api_key = 'TERM',
+            name = 'Ollama',
+            end_point = 'http://localhost:11434/v1/completions',
+            model = 'qwen2.5-coder:7b',
+            optional = {
+              max_tokens = 56,
+              top_p = 0.9,
+            },
+          },
+        },
+      }
+    end,
   },
 
   { -- Claude Code — wraps the Claude Code CLI in an nvim terminal split

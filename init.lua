@@ -872,6 +872,23 @@ require('lazy').setup({
     },
   },
 
+  { -- Symbol outline (IntelliJ Structure tool window)
+    'stevearc/aerial.nvim',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-tree/nvim-web-devicons',
+    },
+    opts = {
+      layout = { default_direction = 'right', min_width = 28 },
+      show_guides = true,
+      -- Attach to every buffer so the outline reflects whatever you're editing
+      attach_mode = 'global',
+    },
+    keys = {
+      { '<leader>o', '<cmd>AerialToggle!<cr>', desc = 'Toggle symbol [o]utline' },
+    },
+  },
+
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()

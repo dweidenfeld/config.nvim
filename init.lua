@@ -814,6 +814,40 @@ require('lazy').setup({
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
+  { -- File explorer (mouse-friendly, IntelliJ-like project tool window)
+    'nvim-neo-tree/neo-tree.nvim',
+    branch = 'v3.x',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-tree/nvim-web-devicons',
+      'MunifTanjim/nui.nvim',
+    },
+    cmd = 'Neotree',
+    keys = {
+      { '<leader>e', '<cmd>Neotree toggle<cr>', desc = 'Toggle file [e]xplorer' },
+      { '<C-n>', '<cmd>Neotree toggle<cr>', desc = 'Toggle file explorer' },
+    },
+    opts = {
+      enable_diagnostics = true,
+      enable_git_status = true,
+      filesystem = {
+        follow_current_file = { enabled = true },
+        filtered_items = {
+          visible = true,
+          hide_dotfiles = false,
+          hide_gitignored = false,
+        },
+      },
+      window = {
+        position = 'left',
+        width = 32,
+        -- mouse_enabled is on by default; keep the popup `<space>` mapping out of
+        -- the way so it doesn't shadow leader bindings.
+        mappings = { ['<space>'] = 'none' },
+      },
+    },
+  },
+
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()

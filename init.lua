@@ -687,7 +687,19 @@ require('lazy').setup({
         -- See :h blink-cmp-config-keymap for defining your own keymap
         preset = 'default',
         ['<S-Tab>'] = { 'select_prev', 'fallback' },
-        ['<Tab>'] = { 'select_next', 'fallback' },
+        -- Tab: navigate the menu when it's open; accept ghost text when one is
+        -- being shown inline; otherwise let the key insert a literal tab so
+        -- indentation still works without an active suggestion.
+        ['<Tab>'] = {
+          function(cmp)
+            if cmp.is_visible() then
+              return cmp.select_next()
+            elseif cmp.is_ghost_text_visible() then
+              return cmp.accept()
+            end
+          end,
+          'fallback',
+        },
         ['<Enter>'] = { 'accept', 'fallback' },
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
@@ -723,6 +735,14 @@ require('lazy').setup({
         -- Don't kick off completion requests on every keystroke — minuet
         -- works better when it has a stable prefix to reason about
         trigger = { prefetch_on_insert = false },
+        -- Copilot-style inline preview: the top-ranked completion (typically
+        -- a minuet/qwen suggestion when LSP is quiet) renders as gray text
+        -- after the cursor. Tab accepts it without needing the popup open.
+        ghost_text = {
+          enabled = true,
+          show_with_menu = false,
+          show_without_menu = true,
+        },
       },
 
       snippets = { preset = 'luasnip' },

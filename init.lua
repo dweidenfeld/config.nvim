@@ -729,7 +729,7 @@ require('lazy').setup({
     },
   },
 
-  {
+  { -- Markdown Table Mode
     'Kicamon/markdown-table-mode.nvim',
     config = function()
       require('markdown-table-mode').setup()
@@ -738,13 +738,31 @@ require('lazy').setup({
     end,
   },
 
-  {
+  { -- GitHub Copilot
     'github/copilot.vim',
     config = function()
       --  To configure it, see `:help copilot` and `:help copilot-config`
       vim.g.copilot_no_tab_map = true
       vim.keymap.set('i', '<C-J>', 'copilot#Accept("\\<CR>")', { expr = true, replace_keycodes = false })
     end,
+  },
+
+  { -- Claude Code — wraps the Claude Code CLI in an nvim terminal split
+    'coder/claudecode.nvim',
+    dependencies = { 'folke/snacks.nvim' },
+    config = true,
+    keys = {
+      { '<leader>a', nil, desc = '[A]I/Claude Code' },
+      { '<leader>ac', '<cmd>ClaudeCode<cr>', desc = 'Toggle [C]laude' },
+      { '<leader>af', '<cmd>ClaudeCodeFocus<cr>', desc = '[F]ocus Claude' },
+      { '<leader>ar', '<cmd>ClaudeCode --resume<cr>', desc = '[R]esume Claude' },
+      { '<leader>aC', '<cmd>ClaudeCode --continue<cr>', desc = '[C]ontinue last Claude session' },
+      { '<leader>am', '<cmd>ClaudeCodeSelectModel<cr>', desc = 'Select [m]odel' },
+      { '<leader>ab', '<cmd>ClaudeCodeAdd %<cr>', desc = 'Send [b]uffer to Claude' },
+      { '<leader>as', '<cmd>ClaudeCodeSend<cr>', mode = 'v', desc = '[S]end selection to Claude' },
+      { '<leader>aa', '<cmd>ClaudeCodeDiffAccept<cr>', desc = '[A]ccept diff' },
+      { '<leader>ad', '<cmd>ClaudeCodeDiffDeny<cr>', desc = '[D]eny diff' },
+    },
   },
 
   { -- Colorscheme

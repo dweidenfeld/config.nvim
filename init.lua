@@ -889,6 +889,16 @@ require('lazy').setup({
     },
   },
 
+  { -- Floating terminal toggle (IntelliJ Alt+F12)
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    opts = {
+      open_mapping = [[<c-\>]],
+      direction = 'float',
+      float_opts = { border = 'rounded' },
+    },
+  },
+
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()

@@ -546,6 +546,16 @@ require('lazy').setup({
         'ts_ls',
         'eslint-lsp',
         'deno',
+        'terraform-ls',
+        'tflint',
+        'dockerfile-language-server',
+        'docker-compose-language-service',
+        'bash-language-server',
+        'yaml-language-server',
+        'lua_ls',
+        'gh-actions-language-server',
+        'pyright',
+        'clangd',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 

@@ -707,9 +707,25 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev' },
+        default = { 'lsp', 'path', 'snippets', 'lazydev', 'copilot' },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+          copilot = {
+            name = 'copilot',
+            module = 'blink-cmp-copilot',
+            score_offset = 100,
+            async = true,
+            -- Tag Copilot items with a distinct kind so they're recognisable in the menu
+            transform_items = function(_, items)
+              local CompletionItemKind = require('blink.cmp.types').CompletionItemKind
+              local kind_idx = #CompletionItemKind + 1
+              CompletionItemKind[kind_idx] = 'Copilot'
+              for _, item in ipairs(items) do
+                item.kind = kind_idx
+              end
+              return items
+            end,
+          },
         },
       },
 
@@ -738,13 +754,21 @@ require('lazy').setup({
     end,
   },
 
-  { -- GitHub Copilot
-    'github/copilot.vim',
-    config = function()
-      --  To configure it, see `:help copilot` and `:help copilot-config`
-      vim.g.copilot_no_tab_map = true
-      vim.keymap.set('i', '<C-J>', 'copilot#Accept("\\<CR>")', { expr = true, replace_keycodes = false })
-    end,
+  { -- GitHub Copilot (Lua port — suggestions surface through blink.cmp, not ghost text)
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    opts = {
+      -- Ghost text and panel are disabled because blink-cmp-copilot pipes Copilot
+      -- suggestions into the regular completion menu instead.
+      suggestion = { enabled = false },
+      panel = { enabled = false },
+    },
+  },
+
+  { -- Copilot source for blink.cmp
+    'giuxtaposition/blink-cmp-copilot',
+    dependencies = { 'zbirenbaum/copilot.lua' },
   },
 
   { -- Claude Code — wraps the Claude Code CLI in an nvim terminal split
